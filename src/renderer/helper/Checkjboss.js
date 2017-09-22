@@ -1,5 +1,7 @@
 var dateFormat = require('dateformat')
 var Client = require('ssh2').Client
+var Promise = require('promise')
+// const aa = require('child_process')
 // var ping = require('ping')
 // var conn = new Client()
 var fs = require('fs')
@@ -9,39 +11,41 @@ var b = {
     console.log('Checkjboss')
   },
   checkstatus (ipaddress = '10.250.3.36', username = 'root', password = 'password') {
-    var Client = require('ssh2').Client
-    var conn = new Client()
-    conn.on('ready', function () {
-      console.log('checkstatus Client :: ready')
-      conn.exec('sh /home/bemhq/script/checkjboss.sh', function (err, stream) {
-        if (err) throw err
-        stream.on('close', function (code, signal) {
-          console.log('Stream :: close :: code: ' + code + ', signal: ' + signal + ' ' + msg + ' ' + err)
-          conn.end()
-        }).on('data', function (data) {
-          if (data.indexOf('RUN') > -1) {
-            msg = 'active'
-          } else {
-            msg = 'inactive'
-          }
-          console.log('STDOUT: ' + data + msg)
-          return msg
-        }).stderr.on('data', function (data) {
-          console.log('STDERR: ' + data)
-          return msg
+    return new Promise((resolve, reject) => {
+      var conn = new Client()
+      conn.on('ready', function () {
+        console.log('checkstatus Client :: ready')
+        conn.exec('sh /home/bemhq/script/checkjboss.sh', function (err, stream) {
+          if (err) throw err
+          stream.on('close', function (code, signal) {
+            // aa.execSync('sleep 5')
+            conn.end()
+          }).on('data', function (data) {
+            if (data.indexOf('RUN') > -1) {
+              msg = 'active'
+              resolve(msg)
+            } else {
+              msg = 'inactive'
+              resolve(msg)
+            }
+            console.log('STDOUT: ' + data + msg)
+          }).stderr.on('data', function (data) {
+            reject(data)
+            console.log('STDERR: ' + data)
+          })
         })
+      }).connect({
+        // host: ipaddress,
+        host: '192.168.1.115',
+        port: 22,
+        username: username,
+        password: password,
+        readyTimeout: 99999
+        // stream.allowHalfOpen = true
+        // privateKey: require('fs').readFileSync('src/renderer/helper/')
+        //  privateKey: require('fs').readFileSync('/here/is/my/key')
       })
-    }).connect({
-      host: ipaddress,
-      port: 22,
-      username: username,
-      password: password,
-      readyTimeout: 99999
-      // stream.allowHalfOpen = true
-      // privateKey: require('fs').readFileSync('src/renderer/helper/')
-      //  privateKey: require('fs').readFileSync('/here/is/my/key')
     })
-    return msg
   },
   startjboss (ipaddress = '10.250.3.36', username = 'root', password = 'password') {
     var conn = new Client()
