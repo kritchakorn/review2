@@ -1,0 +1,4 @@
+ipaddress,plzaid,plazaname,jboss-status,backup-status,check-obu-status
+10.201.1.17,201,AS1,NONE,NONE,NONE
+10.202.1.17,202,AS2,NONE,NONE,NONE
+10.250.3.36,360,TEST,NONE,NONE,NONE
