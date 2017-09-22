@@ -27,85 +27,90 @@
   </template>
 
   <script>
-  import Common from '@/helper/Common'
-  import Checkjboss from '@/helper/Checkjboss'
-  // import Uptime from '@/helper/Uptime'
-  // import ModalForm from '@/components/Modal/ModalForm'
+import Common from '@/helper/Common'
+import Checkjboss from '@/helper/Checkjboss'
+// import Uptime from '@/helper/Uptime'
+// import ModalForm from '@/components/Modal/ModalForm'
 
-  export default {
-  /* created2 () {
-      for (var i = 1; i < 5; i++) {
-        var item = {}
-        item.id = 200 + i
-        item.name = 'AS' + i
-        item.status = 'active'
-        this.lists.push(item)
-      }
-    }, */
-    created () {
-      this.lists = Common.readfileconf()
-    },
-    data () {
-      return {
-        lists: [],
-        showModal: false,
-        email: '',
-        password: ''
-      }
-    },
-    components: {
+export default {
+    /* created2 () {
+    for (var i = 1; i < 5; i++) {
+    var item = {}
+    item.id = 200 + i
+    item.name = 'AS' + i
+    item.status = 'active'
+    this.lists.push(item)
+  }
+}, */
+  created () {
+    this.lists = Common.readfileconf()
+  },
+  data () {
+    return {
+      lists: [],
+      showModal: false,
+      email: '',
+      password: ''
+    }
+  },
+  components: {
     //   ModalForm
+  },
+  methods: {
+    btnClick () {
+      console.log(Common.hello())
     },
-    methods: {
-      btnClick () {
-        console.log(Common.hello())
-      },
-      oncheckjboss (data, index) {
-        console.log('check jboss')
-        console.log(data.ipaddress)
-        // Checkjboss.echo()
-        // Uptime.upt()
-        var msg = ''
-        Checkjboss.checkstatus(data.ipaddress, 'root', 'password', function (c) {
-          msg = c
-        })
-        console.log('retrun jboss startus' + msg)
+    oncheckjboss (data, index) {
+      console.log('check jboss')
+      console.log(data.ipaddress)
+      // Checkjboss.echo()
+      // Uptime.upt()
+
+      var msg = ''
+      Checkjboss.checkstatus(data.ipaddress, 'root', 'password').then((mssg) => {
+        msg = mssg
+        console.log('######success########' + mssg)
         if (msg === 'active') {
+          console.log('set status' + msg)
           this.lists[index].status = 'active'
         } else if (msg === 'inactive') {
+          console.log('set status' + msg)
           this.lists[index].status = 'inactive'
         } else {
+          console.log('set status' + msg)
           this.lists[index].status = 'none'
         }
-
-        console.log(msg)
-      },
-      onCheckAction (data, index) {
-        // data call cheeck jbossstatus
-        console.log('hellp')
-        this.lists[index].status = 'inactive'
-        // this.showModal = true
-      },
-      renderTag (status) {
-        if (status === 'active') {
-          return 'is-success'
-        } else if (status === 'inactive') {
-          return 'is-danger'
-        }
-      },
-      login () {
-        console.log(this.email, this.password)
-      },
-      emailChange (email) {
-        this.email = email
-      },
-      onFormChange (field, value) {
-        this[field] = value
+      }).catch((error) => {
+        console.log('######error########' + error)
+        msg = error
+      })
+    },
+    onCheckAction (data, index) {
+      // data call cheeck jbossstatus
+      console.log('hellp')
+      this.lists[index].status = 'inactive'
+      // this.showModal = true
+    },
+    renderTag (status) {
+      if (status === 'active') {
+        return 'is-success'
+      } else if (status === 'inactive') {
+        return 'is-danger'
       }
+    },
+    login () {
+      console.log(this.email, this.password)
+    },
+    emailChange (email) {
+      this.email = email
+    },
+    onFormChange (field, value) {
+      this[field] = value
     }
   }
-  </script>
+}
+</script>
 
-  <style lang="css">
+<style lang="css">
 
-  </style>
+</style>
