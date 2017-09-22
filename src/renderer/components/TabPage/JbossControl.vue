@@ -14,9 +14,9 @@
           <td>{{ data.id }}</td>
           <td>{{ data.name }}</td>
           <td><span :class="['tag', renderTag(data.status)]">{{ data.status }}</span></td>
-          <td><a class="button" @click="oncheckjboss(data, index)">Check Status</a>
-            <a class="button" @click="onCheckAction(data, index)">Start Jboss</a>
-            <a class="button" @click="onCheckAction(data, index)">Stop Jboss</a></td>
+          <td><a class="button" @click="onjbossutil(data, index)">Check Status</a>
+            <a class="button" @click="onstartjboss(data, index)">Start Jboss</a>
+            <a class="button" @click="onstopjboss(data, index)">Stop Jboss</a></td>
           </tr>
         </tbody>
       </table>
@@ -28,20 +28,8 @@
 
   <script>
   import Common from '@/helper/Common'
-  import Checkjboss from '@/helper/Checkjboss'
-  // import Uptime from '@/helper/Uptime'
-  // import ModalForm from '@/components/Modal/ModalForm'
-
+  import jbossutil from '@/helper/jbossutil'
   export default {
-  /* created2 () {
-      for (var i = 1; i < 5; i++) {
-        var item = {}
-        item.id = 200 + i
-        item.name = 'AS' + i
-        item.status = 'active'
-        this.lists.push(item)
-      }
-    }, */
     created () {
       this.lists = Common.readfileconf()
     },
@@ -54,31 +42,77 @@
       }
     },
     components: {
-    //   ModalForm
+      //   ModalForm
     },
     methods: {
       btnClick () {
         console.log(Common.hello())
       },
-      oncheckjboss (data, index) {
+      onjbossutil (data, index) {
         console.log('check jboss')
         console.log(data.ipaddress)
-        // Checkjboss.echo()
-        // Uptime.upt()
         var msg = ''
-        Checkjboss.checkstatus(data.ipaddress, 'root', 'password', function (c) {
-          msg = c
+        jbossutil.checkstatus(data.ipaddress, 'root', 'password').then((mssg) => {
+          msg = mssg
+          console.log('######success########' + mssg)
+          if (msg === 'active') {
+            console.log('set status' + msg)
+            this.lists[index].status = 'active'
+          } else if (msg === 'inactive') {
+            console.log('set status' + msg)
+            this.lists[index].status = 'inactive'
+          } else {
+            console.log('set status' + msg)
+            this.lists[index].status = 'none'
+          }
+        }).catch((error) => {
+          console.log('######error########' + error)
+          msg = error
         })
-        console.log('retrun jboss startus' + msg)
-        if (msg === 'active') {
-          this.lists[index].status = 'active'
-        } else if (msg === 'inactive') {
-          this.lists[index].status = 'inactive'
-        } else {
-          this.lists[index].status = 'none'
-        }
-
-        console.log(msg)
+      },
+      onstartjboss (data, index) {
+        console.log('start jboss')
+        console.log(data.ipaddress)
+        var msg = ''
+        console.log(jbossutil.startjboss('10.250.3.36', 'root', 'password')).then((mssg) => {
+          msg = mssg
+          console.log('######success########' + mssg)
+          if (msg === 'active') {
+            console.log('set status' + msg)
+            this.lists[index].status = 'active'
+          } else if (msg === 'inactive') {
+            console.log('set status' + msg)
+            this.lists[index].status = 'inactive'
+          } else {
+            console.log('set status' + msg)
+            this.lists[index].status = 'none'
+          }
+        }).catch((error) => {
+          console.log('######error########' + error)
+          msg = error
+        })
+      },
+      onstopjboss (data, index) {
+        console.log('start jboss')
+        console.log(data.ipaddress)
+        var msg = ''
+        console.log(jbossutil.stopjboss('10.250.3.36', 'root', 'password')).then((mssg) => {
+          msg = mssg
+          console.log('######success########' + mssg)
+          if (msg === 'active') {
+            console.log('set status' + msg)
+            this.lists[index].status = 'active'
+          } else if (msg === 'inactive') {
+            console.log('set status' + msg)
+            this.lists[index].status = 'inactive'
+          } else {
+            console.log('set status' + msg)
+            this.lists[index].status = 'none'
+          }
+        }).catch((error) => {
+          console.log('######error########' + error)
+          msg = error
+        })
       },
       onCheckAction (data, index) {
         // data call cheeck jbossstatus

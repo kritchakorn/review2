@@ -103,7 +103,7 @@
   </template>
 
   <script>
-  import Checkjboss from '@/helper/Checkjboss'
+  import jbossutil from '@/helper/jbossutil'
   // import axios from 'axios'
   var fs = require('fs')
 
@@ -133,9 +133,9 @@
         return 'error'
       },
       uploadFile2 () {
-        // Checkjboss.changeuser('10.201.1.17', 'bemhq', '@HQbem246')
+        // jbossutil.changeuser('10.201.1.17', 'bemhq', '@HQbem246')
         console.log('test su jboss')
-        Checkjboss.changeuser('10.201.1.17', 'bemhq', '@HQbem246')
+        jbossutil.changeuser('10.201.1.17', 'bemhq', '@HQbem246')
       },
       check () {
         // console.log(files.name)
