@@ -11,27 +11,18 @@
         <router-link to="/jbosscontrol"><span class="icon is-small"><i class="fa fa-image"></i></span>Check Jboss Status</router-link>
       </li>
       <li>
-        <router-link to="/backupjboss"><span class="icon is-small"><i class="fa fa-image"></i></span>Backup Program</router-link>
-      </li>
-      <li>
-        <router-link to="/tab3"><span class="icon is-small"><i class="fa fa-image"></i></span>ssh test</router-link>
+        <router-link to="/backupprogram"><span class="icon is-small"><i class="fa fa-image"></i></span>Backup Program</router-link>
       </li>
       <li>
         <a>
           <router-link to="/tab2"><span class="icon is-small"><i class="fa fa-file-text-o"></i></span>
-          <span>Documents</span></router-link>
+          <span>test function</span></router-link>
         </a>
       </li>
       <li>
         <a>
           <router-link to="/UploadProgram"><span class="icon is-small"><i class="fa fa-file-text-o"></i></span>
           <span>uploadprogram</span></router-link>
-        </a>
-      </li>
-      <li>
-        <a>
-          <router-link to="/UploadProgram2"><span class="icon is-small"><i class="fa fa-file-text-o"></i></span>
-          <span>uploadprogram2</span></router-link>
         </a>
       </li>
     </ul>
