@@ -17,7 +17,7 @@ var a = {
 
   readfileconf () {
     var lists = []
-    var array = fs.readFileSync('src/renderer/helper/test.text').toString().trim().split(os.EOL)
+    var array = fs.readFileSync('src/renderer/helper/plaza.txt').toString().trim().split(os.EOL)
     console.log('arra' + array)
     var j = 0
     var last = array.length
@@ -31,6 +31,27 @@ var a = {
         item.id = arr[1]
         item.name = arr[2]
         item.status = arr[3]
+        lists.push(item)
+        console.log(lists)
+      }
+      j++
+    }
+    return lists
+  },
+  readuserconf () {
+    var lists = []
+    var array = fs.readFileSync('src/renderer/helper/user.txt').toString().trim().split(os.EOL)
+    console.log('arra' + array)
+    var j = 0
+    var last = array.length
+    console.log(last)
+    for (var i in array) {
+      if (j >= 1 && j <= 3) {
+        var item = {}
+        console.log(i)
+        var arr = array[i].trim().split(',')
+        item.username = arr[0]
+        item.passwoord = arr[1]
         lists.push(item)
         console.log(lists)
       }

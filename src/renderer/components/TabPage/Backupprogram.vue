@@ -25,11 +25,9 @@
     <a @click="btnClick" class="button is-warning">btun</a>
   </section>
 </template>
-
 <script>
 import Common from '@/helper/Common'
 import jbossutil from '@/helper/jbossutil'
-import ModalForm from '@/components/Modal/ModalForm'
 
 export default {
   created () {
@@ -44,7 +42,7 @@ export default {
     }
   },
   components: {
-    ModalForm
+
   },
   methods: {
     btnClick () {
@@ -54,15 +52,15 @@ export default {
       console.log('check jboss')
       console.log(data.ipaddress)
       var msg = ''
-      jbossutil.backupjboss(data.ipaddress, 'root', 'password').then((mssg) => {
+      jbossutil.backupjboss(data.ipaddress, 'bemhq', '@HQbem246').then((mssg) => {
         msg = mssg
         console.log('######success########' + mssg)
-        if (msg === 'active') {
+        if (msg === 'BACKUP') {
           console.log('set status' + msg)
-          this.lists[index].status = 'active'
-        } else if (msg === 'inactive') {
+          this.lists[index].status = 'BACKUP'
+        } else if (msg === 'NO') {
           console.log('set status' + msg)
-          this.lists[index].status = 'inactive'
+          this.lists[index].status = 'NO'
         } else {
           console.log('set status' + msg)
           this.lists[index].status = 'none'
@@ -76,22 +74,23 @@ export default {
       console.log('check jboss')
       console.log(data.ipaddress)
       var msg = ''
-      jbossutil.checkbackupjboss(data.ipaddress, 'root', 'password').then((mssg) => {
+      jbossutil.checkbackupjboss(data.ipaddress, 'bemhq', '@HQbem246').then((mssg) => {
         msg = mssg
-        console.log('######success########' + mssg)
-        if (msg === 'active') {
-          console.log('set status' + msg)
-          this.lists[index].status = 'active'
-        } else if (msg === 'inactive') {
-          console.log('set status' + msg)
-          this.lists[index].status = 'inactive'
-        } else {
-          console.log('set status' + msg)
-          this.lists[index].status = 'none'
+        console.log('######success' + msg + '123')
+        this.lists[index].status = mssg
+        if (mssg === 'BACKUP') {
+          console.log('set status YES' + mssg)
+          this.lists[index].status = 'BACKUP'
+        } else if (mssg === 'NO') {
+          console.log('set status NO' + mssg)
+          this.lists[index].status = 'NO'
+        } else if (mssg === 'ERROR') {
+          console.log('set status ERROR ' + mssg)
+          this.lists[index].status = 'ERROR'
         }
+        // this.lists[index].status = mssg
       }).catch((error) => {
         console.log('######error########' + error)
-        msg = error
       })
     },
     onCheckAction (data, index) {
@@ -100,9 +99,9 @@ export default {
       this.showModal = true
     },
     renderTag (status) {
-      if (status === 'active') {
+      if (status === 'BACKUP') {
         return 'is-success'
-      } else if (status === 'inactive') {
+      } else if (status === 'NO') {
         return 'is-danger'
       }
     },
@@ -114,9 +113,13 @@ export default {
     },
     onFormChange (field, value) {
       this[field] = value
+    },
+    trim (str) {
+      return this.str.replace(/^\s\s*/, '').replace(/\s\s*$/, '')
     }
   }
 }
+
 </script>
 
 <style lang="css">

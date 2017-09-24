@@ -1,16 +1,20 @@
+import Common from '@/helper/Common'
 var dateFormat = require('dateformat')
 var Client = require('ssh2').Client
 var Promise = require('promise')
+var userlist = Common.readuserconf()
+console.log(userlist)
 // const aa = require('child_process')
 // var ping = require('ping')
 // var conn = new Client()
 var fs = require('fs')
 var msg = ''
+
 var b = {
   echo () {
     console.log('Checkjboss')
   },
-  checkstatus (ipaddress = '10.250.3.36', username = 'root', password = 'password') {
+  checkstatus (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
     return new Promise((resolve, reject) => {
       var conn = new Client()
       conn.on('ready', function () {
@@ -21,6 +25,7 @@ var b = {
             // aa.execSync('sleep 5')
             conn.end()
           }).on('data', function (data) {
+            console.log('status jboss' + ipaddress + data)
             if (data.indexOf('RUN') > -1) {
               msg = 'active'
               resolve(msg)
@@ -36,7 +41,7 @@ var b = {
         })
       }).connect({
         // host: ipaddress,
-        host: '192.168.1.115',
+        host: ipaddress,
         port: 22,
         username: username,
         password: password,
@@ -47,12 +52,12 @@ var b = {
       })
     })
   },
-  startjboss (ipaddress = '10.250.3.36', username = 'root', password = 'password') {
+  startjboss (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
     var conn = new Client()
     console.log('F.startjboss')
     conn.on('ready', function () {
       console.log('Client :: ready')
-      conn.exec('service jboss start', function (err, stream) {
+      conn.exec('sudo su - jboss;service jboss start', function (err, stream) {
         if (err) throw err
         stream.on('close', function (code, signal) {
           console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
@@ -75,12 +80,41 @@ var b = {
       //  privateKey: require('fs').readFileSync('/here/is/my/key')
     })
   },
-  stopjboss (ipaddress = '10.250.3.36', username = 'root', password = 'password') {
+  stopjboss (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
     var conn = new Client()
     console.log('F.stopjboss')
     conn.on('ready', function () {
       console.log('Client :: ready')
-      conn.exec('service jboss stop', function (err, stream) {
+      conn.exec('sudo su - jboss;service jboss stop', function (err, stream) {
+        if (err) throw err
+        stream.on('close', function (code, signal) {
+          console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
+          conn.end()
+        }).on('data', function (data) {
+          console.log('STDOUT: ' + data)
+          return data
+        }).stderr.on('data', function (data) {
+          console.log('STDERR: ' + data)
+          return data
+        })
+      })
+    }).connect({
+      host: ipaddress,
+      port: 22,
+      username: username,
+      password: password,
+      readyTimeout: 99999
+      // privateKey: require('fs').readFileSync('./')
+      //  privateKey: require('fs').readFileSync('/here/is/my/key')
+    })
+  },
+  killjboss (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
+    var conn = new Client()
+    console.log('F.stopjboss')
+    conn.on('ready', function () {
+      console.log('Client :: ready')
+      console.log('sudo su jboss;ps -ef | grep jboss | grep -v grep | awk ' + '\'' + '{print $2}' + '\'' + '| xargs kill -9')
+      conn.exec('ps -ef | grep jboss | grep -v grep | awk ' + '\'' + '{print $2}' + '\'' + ' | xargs kill -9', function (err, stream) {
         if (err) throw err
         stream.on('close', function (code, signal) {
           console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
@@ -104,59 +138,100 @@ var b = {
     })
   },
   backupjboss (ipaddress = '10.201.1.17', username = 'bemhq', password = '@HQbem246') {
-    var conn = new Client()
-    console.log('F.backupjboss')
-    var now = new Date()
-    var dd = dateFormat(now, 'YYYY-MM-DD')
-    conn.on('ready', function () {
-      console.log('start backup' + dd)
-      conn.exec('sudo su - jboss; sh ./home/jboss/jboss-4.2.3.GA/server/default/ear_backup.sh;' + dd, function (err, stream) {
-        if (err) throw err
-        stream.on('close', function (code, signal) {
-          console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
-          conn.end()
-        }).on('data', function (data) {
-          console.log('STDOUT: ' + data)
-          return data
-        }).stderr.on('data', function (data) {
-          console.log('STDERR: ' + data)
-          return data
+    return new Promise((resolve, reject) => {
+      var conn = new Client()
+      console.log('F.backupjboss')
+      var now = new Date()
+      var dd = dateFormat(now, 'YYYY-MM-DD')
+      conn.on('ready', function () {
+        console.log('start backup' + dd)
+        conn.exec('sudo su - jboss; sh ./home/jboss/jboss-4.2.3.GA/server/default/ear_backup.sh;', function (err, stream) {
+          if (err) throw err
+          stream.on('close', function (code, signal) {
+            console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
+            conn.end()
+          }).on('data', function (data) {
+            resolve('BACKUP')
+            console.log('STDOUT: ' + data)
+            return data
+          }).stderr.on('data', function (data) {
+            resolve('ERROR')
+            console.log('STDERR: ' + data)
+            return data
+          })
         })
+      }).connect({
+        host: ipaddress,
+        port: 22,
+        username: username,
+        password: password,
+        readyTimeout: 99999
+        // privateKey: require('fs').readFileSync('./')
+        //  privateKey: require('fs').readFileSync('/here/is/my/key')
       })
-    }).connect({
-      host: ipaddress,
-      port: 22,
-      username: username,
-      password: password,
-      readyTimeout: 99999
-      // privateKey: require('fs').readFileSync('./')
-      //  privateKey: require('fs').readFileSync('/here/is/my/key')
     })
   },
-  checkbackupjboss (ipaddress = '10.250.3.36', username = 'root', password = 'password') {
-    var conn = new Client()
-    console.log('F.checkbackupjboss')
-    var now = new Date()
-    var dd = dateFormat(now, 'yyyy-mm-dd')
-    conn.on('ready', function () {
-      console.log('Client :: ready')
-      conn.shell(function (err, stream) {
-        if (err) throw err
-        stream.on('close', function () {
-          console.log('Stream :: close')
-          conn.end()
-        }).on('data', function (data) {
-          console.log('STDOUT: ' + data)
-        }).stderr.on('data', function (data) {
-          console.log('STDERR: ' + data)
+  checkbackupjboss (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
+    return new Promise((resolve, reject) => {
+      var conn = new Client()
+      conn.on('ready', function () {
+        console.log('Client :: ready')
+        conn.exec('sudo su jboss /home/bemhq/script/checkbackup.sh', {pty: true}, function (err, stream) {
+          if (err) throw err
+          stream.on('close', function (code, signal) {
+            console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
+            conn.end()
+          }).on('data', function (data) {
+            console.log('STDOUT:' + data)
+            if (data.indexOf('BACKUP') > -1) {
+              msg = 'BACKUP'
+              resolve(msg)
+            } else {
+              msg = 'NO'
+              resolve(msg)
+            }
+            console.log('STDOUT:' + msg)
+          }).stderr.on('data', function (data) {
+            resolve('ERROR')
+            console.log('STDERR: ' + data)
+          })
         })
-        stream.end('sudo su - jboss\nls /home/jboss/jboss-4.2.3.GA/server/default/backup_ear/backup_' + dd + '\n')
+      }).connect({
+        host: ipaddress,
+        port: 22,
+        username: username,
+        password: password,
+        readyTimeout: 99999
+        // privateKey: require('fs').readFileSync('./')
+        //  privateKey: require('fs').readFileSync('/here/is/my/key')
       })
-    }).connect({
-      host: ipaddress,
-      port: 22,
-      username: username,
-      password: password
+    })
+  },
+  checkbackupjboss2 (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
+    return new Promise((resolve, reject) => {
+      var conn = new Client()
+      conn.on('ready', function () {
+        console.log('Client :: ready')
+        conn.shell(function (err, stream) {
+          if (err) throw err
+          stream.on('close', function () {
+            console.log('Stream :: close')
+            conn.end()
+          }).on('data', function (data) {
+            resolve(data)
+            console.log('STDOUT: ' + data)
+          }).stderr.on('data', function (data) {
+            resolve('ERROR')
+            console.log('STDERR: ' + data)
+          })
+          stream.end('sudo su jboss /home/bemhq/script/checkbackup.sh')
+        })
+      }).connect({
+        host: ipaddress,
+        port: 22,
+        username: username,
+        password: password
+      })
     })
   },
   deployfile (host = '10.250.3.36', username = 'root', password = 'password', filename = '') {
