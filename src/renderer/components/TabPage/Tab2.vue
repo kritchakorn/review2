@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import Checkjboss from '@/helper/Checkjboss'
+import jbossutil from '@/helper/jbossutil'
 import Common from '@/helper/Common'
 export default {
 
@@ -33,13 +33,13 @@ export default {
       console.log('dd')
     },
     onCheckAction () {
-      this.i = Checkjboss.checkstatus('10.250.3.36', 'root', 'password')
+      this.i = jbossutil.checkstatus('10.250.3.36', 'root', 'password')
     },
     onCheckAction2 () {
-      console.log(Checkjboss.startjboss('10.250.3.36', 'root', 'password'))
+      console.log(jbossutil.startjboss('10.250.3.36', 'root', 'password'))
     },
     onCheckAction3 () {
-      console.log(Checkjboss.stopjboss('10.250.3.36', 'root', 'password'))
+      console.log(jbossutil.stopjboss('10.250.3.36', 'root', 'password'))
     },
     onCheckAction4 () {
       console.log(Common.writefileconf())

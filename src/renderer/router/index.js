@@ -23,8 +23,8 @@ export default new Router({
       component: require('@/components/TabPage/Login')
     },
     {
-      path: '/backupjboss',
-      component: require('@/components/TabPage/BackupJboss')
+      path: '/Backupprogram',
+      component: require('@/components/TabPage/Backupprogram')
     },
     {
       path: '/uploadprogram',
