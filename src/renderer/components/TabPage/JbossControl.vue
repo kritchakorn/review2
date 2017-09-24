@@ -27,7 +27,6 @@
   </template>
 
   <script>
-<<<<<<< HEAD
 import Common from '@/helper/Common'
 import Checkjboss from '@/helper/Checkjboss'
 // import Uptime from '@/helper/Uptime'
