@@ -96,7 +96,6 @@ export default {
         return 'is-success'
       } else if (status === 'inactive') {
         return 'is-danger'
-=======
   import Common from '@/helper/Common'
   import jbossutil from '@/helper/jbossutil'
   export default {
