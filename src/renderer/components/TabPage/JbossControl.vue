@@ -34,7 +34,7 @@
       this.lists = Common.readfileconf()
     },
     data () {
-      return {
+      return { 
         lists: [],
         showModal: false,
         email: '',
