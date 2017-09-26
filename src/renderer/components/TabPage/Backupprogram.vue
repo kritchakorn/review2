@@ -6,7 +6,7 @@
           <th>ID</th>
           <th>Plaza Id</th>
           <th>Backup Status</th>
-          <th>Control</th>
+          <th><center>Control</center></th>
         </tr>
       </thead>
       <tbody>

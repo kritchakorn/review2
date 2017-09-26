@@ -5,9 +5,6 @@
         <div class="field-label is-normal">
           <label class="label"></label>
         </div>
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <p class="control is-expanded has-icons-left">
               <label class="file-label">
                 <h1 class="title is-1">
                   Upload Program
@@ -16,17 +13,12 @@
 
                 </h1>
               </label>
-            </p>
-          </div>
-        </div>
       </div>
     </header>
 
     <div class="container">
       <div class="field is-horizontal">
-        <div class="field-label is-normal">
-          <label class="label">Choose upload File</label>
-        </div>
+
         <div class="field-body">
           <div class="field">
             <p class="control is-expanded has-icons-left">
@@ -41,7 +33,18 @@
                       </span>
                       <a>{{Message}}</a>
                       <span class="file-label">
-                        Warning file…
+                        <table class="table" style="width:100%">
+                          <thead>
+                            <tr>
+                              <th>File Name</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(data,index) in lists2">
+                              <center>{{data}}</center>
+                            </tr>
+                          </tbody>
+                        </table>
                       </span>
                     </span>
                   </label>
@@ -62,7 +65,7 @@
                     <a class="button is-primary" @click="uploadFile">Submit</a>
                   </div>
                   <div class="column">
-                    <a class="button is-light">Cancel</a>
+                    <a class="button is-light" @click="clearfile" >Clear File</a>
                   </p>
                 </div>
               </div>
@@ -71,66 +74,78 @@
         </div>
       </div>
       <div class="columns">
-        <div class="field is-horizontal">
-          <div class="field-label"></div>
           <div class="field-body">
             <div class="field is-expanded">
-              <div class="field is-grouped">
-                <p class="control is-expanded has-icons-left">
-                  <div class="column">
-                    <a class="button is-primary" @click="uploadFile2">changeuser</a>
-                  </div>
+                    <h1 class="title is-1">
+                      Deploy Program
+                    </h1>
               </div>
             </div>
           </div>
+          <section class="section">
+            <table class="table" style="width:100%">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Plaza Id</th>
+                  <th>Deploy Status</th>
+                  <th><center>Control</center></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(data, index) in lists">
+                  <td>{{ data.id }}</td>
+                  <td>{{ data.name }}</td>
+                  <td><span :class="['tag', renderTag(data.status)]">{{ data.status }}</span></td>
+                  <td>
+                    <center><a class="button" @click="deployprogram(data, index)">Deploy Program</a></center>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
         </div>
       </div>
-      <div class="columns">
-        <div class="field is-horizontal">
-          <div class="field-label"></div>
-          <div class="field-body">
-            <div class="field is-expanded">
-              <p class="control is-expanded has-icons-left">
-                <div class="column">
-                </div>
-              </div>
-            </div></div>
-          </div>
-        </div>
-
-      </div>
-    </div>
   </template>
 
   <script>
+  import Common from '@/helper/Common'
   import jbossutil from '@/helper/jbossutil'
-  // import axios from 'axios'
   var fs = require('fs')
-
-  // var Future = require('fibers/future')
-  // var os = require('os')
   export default {
-    name: 'app',
+    created () {
+      this.lists = Common.readfileconf()
+      this.lists2 = Common.readuploadfile('src/tmpfile')
+      // var test = Promise.resolve(this.lists2)
+      console.log('RETURN' + this.lists2)
+    },
     data () {
       // var filejar
       return {
+        lists2: [],
+        lists: [],
         image: '',
         Message: '1',
         filejar: ''
       }
     },
     methods: {
+      deployprogram (data, index) {
+        console.log('upload' + data.ipaddress)
+        jbossutil.deployfile(data.ipaddress, 'bemhq', '@HQbem246')
+      },
       uploadFile (e) {
         console.log('upload' + this.filejar.size)
-        // var ee = document.getElementByName('file')
-        // console.log('upload' + e)
-        // console.log('upload2' + ee.target.files)
-
         if (this.check()) {
           var path = 'src/tmpfile/' + this.filejar.name
           this.copyFile(this.filejar.path, path)
+          this.lists2 = Common.readuploadfile('src/tmpfile')
         }
         return 'error'
+      },
+      clearfile (e) {
+        Common.clearfile('src/tmpfile')
+        this.lists2 = Common.readuploadfile('src/tmpfile')
       },
       uploadFile2 () {
         // jbossutil.changeuser('10.201.1.17', 'bemhq', '@HQbem246')
@@ -145,6 +160,13 @@
         }
         console.log('true')
         return true
+      },
+      renderTag (status) {
+        if (status === 'BACKUP') {
+          return 'is-success'
+        } else if (status === 'NO') {
+          return 'is-danger'
+        }
       },
       onFileChange (e) {
         console.log('140' + e.target.files)
@@ -204,6 +226,9 @@
           alert(e.target.result)
         }
         reader.readAsDataURL(files[0])
+      },
+      btnClick () {
+        console.log(Common.hello())
       }
     }
   }

@@ -14,7 +14,22 @@ var a = {
     }
     console.log(this.lists)
   },
-
+  clearfile (path = 'src/tmpfile') {
+    fs.readdir(path, (err, files) => {
+      if (err) throw err
+      for (const file of files) {
+        console.log(path + file)
+        fs.unlink((path + '\\' + file), err => {
+          if (err) throw err
+        })
+      }
+    })
+  },
+  readuploadfile (path = 'src/tmpfile') {
+    var files = fs.readdirSync(path)
+    console.log(files)
+    return files
+  },
   readfileconf () {
     var lists = []
     var array = fs.readFileSync('src/renderer/helper/plaza.txt').toString().trim().split(os.EOL)

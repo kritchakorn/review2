@@ -6,7 +6,7 @@
           <th>ID</th>
           <th>Plaza Id</th>
           <th>Jboss Status</th>
-          <th  align='center'>Control</th>
+          <th><center>Control</center></th>
         </tr>
       </thead>
       <tbody>
@@ -14,10 +14,10 @@
           <td>{{ data.id }}</td>
           <td>{{ data.name }}</td>
           <td><span :class="['tag', renderTag(data.status)]">{{ data.status }}</span></td>
-          <td><a class="button" @click="oncheckjboss(data, index)">Check Status</a>
+          <td><center><a class="button" @click="oncheckjboss(data, index)">Check Status</a>
             <a class="button" @click="onstartjboss(data, index)">Start Jboss</a>
             <a class="button" @click="onstopjboss(data, index)">Stop Jboss</a>
-            <a class="button" @click="onkilljboss(data, index)">Force Kill Jboss</a></td>
+            <a class="button" @click="onkilljboss(data, index)">Force Kill Jboss</a></center></td>
           </tr>
         </tbody>
       </table>

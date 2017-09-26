@@ -1,5 +1,6 @@
 import Common from '@/helper/Common'
 var dateFormat = require('dateformat')
+// var path = require('path')
 var Client = require('ssh2').Client
 var Promise = require('promise')
 var userlist = Common.readuserconf()
@@ -19,7 +20,7 @@ var b = {
       var conn = new Client()
       conn.on('ready', function () {
         console.log('checkstatus Client :: ready')
-        conn.exec('sh /home/bemhq/script/checkjboss.sh', function (err, stream) {
+        conn.exec('sh /home/bemhq/script/checkjboss.sh', {pty: true}, function (err, stream) {
           if (err) throw err
           stream.on('close', function (code, signal) {
             // aa.execSync('sleep 5')
@@ -243,26 +244,33 @@ var b = {
       password: password
     }
     // var remotePathToList = '/var/www/ourcodeworld'
-    if (filename !== '') {
-      console.log(filename)
+    var list = Common.readuploadfile('src/tmpfile')
+    for (var i = 0; i <= list.length; i++) {
+      console.log('deploy file' + this.list[i])
+      var file = this.list[i]
+      // var filepaht = 'c:\\review2\\src\\tmpfile\\' + list[i]
+      // var fileuplad = '/home/bemhq/' + list[i]
+      // console.log('1 file:' + filepaht + ' end')
+      console.log('2 file:' + file + ' end')
       conn.on('ready', function () {
         conn.sftp(function (err, sftp) {
+          console.log(err)
           if (err) throw err
-          var readStream = fs.createReadStream('./src/tmpfile/' + filename)
-          var writeStream = sftp.createWriteStream(filename)
+          console.log('read stream')
+          var readStream = fs.createReadStream('./src/tmpfile' + file)
+          console.log('write stream')
+          var writeStream = sftp.createWriteStream('/home/bemhq/' + file)
           writeStream.on('close', function () {
             console.log('- file transferred succesfully')
           })
           writeStream.on('end', function () {
             console.log('sftp connection closed')
             conn.close()
-            return 'success'
           })
+          console.log('write file' + writeStream)
           readStream.pipe(writeStream)
         })
       }).connect(connSettings)
-    } else {
-      return 'error'
     }
   },
   changeuser (ipaddress = '10.201.1.17', username = 'bemhq', password = '@HQbem246') {
