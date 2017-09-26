@@ -9,14 +9,14 @@
       </li>
       <li>
         <a>
-          <router-link to="/tab2"><span class="icon is-small"><i class="fa fa-file-text-o"></i></span>
-          <span>test function </span></router-link>
+          <router-link to="/UploadProgram"><span class="icon is-small"><i class="fa fa-file-text-o"></i></span>
+          <span>uploadprogram</span></router-link>
         </a>
       </li>
       <li>
         <a>
-          <router-link to="/UploadProgram"><span class="icon is-small"><i class="fa fa-file-text-o"></i></span>
-          <span>uploadprogram</span></router-link>
+          <router-link to="/tab2"><span class="icon is-small"><i class="fa fa-file-text-o"></i></span>
+          <span>test function </span></router-link>
         </a>
       </li>
     </ul>
