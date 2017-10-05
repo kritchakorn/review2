@@ -111,6 +111,7 @@
   <script>
   import Common from '@/helper/Common'
   import jbossutil from '@/helper/jbossutil'
+  var config = require('@/helper/config')
   var fs = require('fs')
   export default {
     created () {
@@ -131,8 +132,10 @@
     },
     methods: {
       deployprogram (data, index) {
-        console.log('upload' + data.ipaddress)
-        jbossutil.deployfile(data.ipaddress, 'bemhq', '@HQbem246')
+        console.log('upload' + data.ipaddress + config.SORCE + config.DESC)
+        jbossutil.createdeployfolder(data.ipaddress, config.SSH_USER, config.SSH_PASS)
+        jbossutil.deployfile(data.ipaddress, config.SSH_USER, config.SSH_PASS)
+        jbossutil.movetojboss(data.ipaddress, config.SSH_USER, config.SSH_PASS)
       },
       uploadFile (e) {
         console.log('upload' + this.filejar.size)
@@ -150,7 +153,7 @@
       uploadFile2 () {
         // jbossutil.changeuser('10.201.1.17', 'bemhq', '@HQbem246')
         console.log('test su jboss')
-        jbossutil.changeuser('10.201.1.17', 'bemhq', '@HQbem246')
+        jbossutil.changeuser('10.201.1.17', config.SSH_USER, config.SSH_PASS)
       },
       check () {
         // console.log(files.name)

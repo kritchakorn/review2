@@ -15,7 +15,7 @@
       </li>
       <li>
         <a>
-          <router-link to="/tab2"><span class="icon is-small"><i class="fa fa-file-text-o"></i></span>
+          <router-link to="/test"><span class="icon is-small"><i class="fa fa-file-text-o"></i></span>
           <span>test function </span></router-link>
         </a>
       </li>

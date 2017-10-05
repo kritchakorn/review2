@@ -3,6 +3,7 @@
     <table class="table" style="width:100%">
       <thead>
         <tr>
+          <th>check</th>
           <th>ID</th>
           <th>Plaza Id</th>
           <th>Jboss Status</th>
@@ -11,6 +12,7 @@
       </thead>
       <tbody>
         <tr v-for="(data, index) in lists">
+          <td><input class='checkbox' type="checkbox" id="checkbox" v-bind:id="data.id" v-bind:value="data.ipaddress" checked='true' ></td>
           <td>{{ data.id }}</td>
           <td>{{ data.name }}</td>
           <td><span :class="['tag', renderTag(data.status)]">{{ data.status }}</span></td>
@@ -33,6 +35,9 @@
   export default {
     created () {
       this.lists = Common.readfileconf()
+      jbossutil.echo()
+      var inputElements = document.getElementsByClassName('checkbox').checked
+      console.log('checkbox' + inputElements)
     },
     data () {
       return {

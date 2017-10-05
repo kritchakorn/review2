@@ -15,8 +15,8 @@ export default new Router({
       component: require('@/components/TabPage/JbossControl')
     },
     {
-      path: '/tab2',
-      component: require('@/components/TabPage/Tab2')
+      path: '/test',
+      component: require('@/components/TabPage/test')
     },
     {
       path: '/login',

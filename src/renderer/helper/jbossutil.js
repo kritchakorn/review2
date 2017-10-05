@@ -1,10 +1,12 @@
 import Common from '@/helper/Common'
+var config = require('@/helper/config')
 var dateFormat = require('dateformat')
 // var path = require('path')
 var Client = require('ssh2').Client
 var Promise = require('promise')
-var userlist = Common.readuserconf()
-console.log(userlist)
+// var userlist = Common.readuserconf()
+console.log('config test' + config.JBOSS_HOME)
+console.log('config test2' + config.BEMHQSCTIP)
 // const aa = require('child_process')
 // var ping = require('ping')
 // var conn = new Client()
@@ -13,14 +15,14 @@ var msg = ''
 
 var b = {
   echo () {
-    console.log('Checkjboss')
+    console.log('global test' + config.JBOSS_HOME)
   },
-  checkstatus (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
+  checkstatus (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
     return new Promise((resolve, reject) => {
       var conn = new Client()
       conn.on('ready', function () {
-        console.log('checkstatus Client :: ready')
-        conn.exec('sh /home/bemhq/script/checkjboss.sh', {pty: true}, function (err, stream) {
+        console.log('checkstatus Client :: ready' + config.BEMHQSCTIP)
+        conn.exec('sh ' + config.BEMHQSCTIP + 'checkjboss.sh', {pty: true}, function (err, stream) {
           if (err) throw err
           stream.on('close', function (code, signal) {
             // aa.execSync('sleep 5')
@@ -53,7 +55,7 @@ var b = {
       })
     })
   },
-  startjboss (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
+  startjboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
     var conn = new Client()
     console.log('F.startjboss')
     conn.on('ready', function () {
@@ -81,7 +83,7 @@ var b = {
       //  privateKey: require('fs').readFileSync('/here/is/my/key')
     })
   },
-  stopjboss (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
+  stopjboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
     var conn = new Client()
     console.log('F.stopjboss')
     conn.on('ready', function () {
@@ -109,7 +111,7 @@ var b = {
       //  privateKey: require('fs').readFileSync('/here/is/my/key')
     })
   },
-  killjboss (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
+  killjboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
     var conn = new Client()
     console.log('F.stopjboss')
     conn.on('ready', function () {
@@ -138,7 +140,7 @@ var b = {
       //  privateKey: require('fs').readFileSync('/here/is/my/key')
     })
   },
-  backupjboss (ipaddress = '10.201.1.17', username = 'bemhq', password = '@HQbem246') {
+  backupjboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
     return new Promise((resolve, reject) => {
       var conn = new Client()
       console.log('F.backupjboss')
@@ -172,7 +174,7 @@ var b = {
       })
     })
   },
-  checkbackupjboss (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
+  checkbackupjboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
     return new Promise((resolve, reject) => {
       var conn = new Client()
       conn.on('ready', function () {
@@ -208,7 +210,7 @@ var b = {
       })
     })
   },
-  checkbackupjboss2 (ipaddress = '10.250.3.36', username = 'bemhq', password = '@HQbem246') {
+  checkbackupjboss2 (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
     return new Promise((resolve, reject) => {
       var conn = new Client()
       conn.on('ready', function () {
@@ -235,19 +237,52 @@ var b = {
       })
     })
   },
-  deployfile (host = '10.250.3.36', username = 'root', password = 'password', filename = '') {
+  createdeployfolder (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
+    var conn = new Client()
+    var now = new Date()
+    var dd = dateFormat(now, 'yyyy-mm-dd')
+    console.log('F.startjboss')
+    conn.on('ready', function () {
+      console.log('Client :: ready')
+      conn.exec('cd /home/bemhq/;mkdir deployfile_' + dd, function (err, stream) {
+        if (err) throw err
+        stream.on('close', function (code, signal) {
+          console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
+          conn.end()
+        }).on('data', function (data) {
+          console.log('STDOUT: ' + data)
+          return data
+        }).stderr.on('data', function (data) {
+          console.log('STDERR: ' + data)
+          return data
+        })
+      })
+    }).connect({
+      host: ipaddress,
+      port: 22,
+      username: username,
+      password: password,
+      readyTimeout: 99999
+      // privateKey: require('fs').readFileSync('./')
+      //  privateKey: require('fs').readFileSync('/here/is/my/key')
+    })
+  },
+  deployfile (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS, filename = '') {
     var conn = new Client()
     var connSettings = {
-      host: host,
+      host: ipaddress,
       port: 22, // Normal is 22 port
       username: username,
       password: password
     }
     // var remotePathToList = '/var/www/ourcodeworld'
     var list = Common.readuploadfile('src/tmpfile')
-    for (var i = 0; i <= list.length; i++) {
-      console.log('deploy file' + this.list[i])
-      var file = this.list[i]
+    console.log(list)
+    for (var val of list) {
+      console.log('deploy file' + val)
+      var file = val
+      var now = new Date()
+      var dd = dateFormat(now, 'yyyy-mm-dd')
       // var filepaht = 'c:\\review2\\src\\tmpfile\\' + list[i]
       // var fileuplad = '/home/bemhq/' + list[i]
       // console.log('1 file:' + filepaht + ' end')
@@ -257,9 +292,9 @@ var b = {
           console.log(err)
           if (err) throw err
           console.log('read stream')
-          var readStream = fs.createReadStream('./src/tmpfile' + file)
+          var readStream = fs.createReadStream('./src/tmpfile/' + file)
           console.log('write stream')
-          var writeStream = sftp.createWriteStream('/home/bemhq/' + file)
+          var writeStream = sftp.createWriteStream('/home/bemhq/deployfile_' + dd + '/' + file)
           writeStream.on('close', function () {
             console.log('- file transferred succesfully')
           })
@@ -273,7 +308,41 @@ var b = {
       }).connect(connSettings)
     }
   },
-  changeuser (ipaddress = '10.201.1.17', username = 'bemhq', password = '@HQbem246') {
+  movetojboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS, soruce = config.SOURCE, desc = config.DESC) {
+    return new Promise((resolve, reject) => {
+      var conn = new Client()
+      console.log('F.backupjboss')
+      var now = new Date()
+      var dd = dateFormat(now, 'YYYY-MM-DD')
+      conn.on('ready', function () {
+        console.log('sudo su - jboss; cp ' + soruce + dd + '/* ' + desc + ';')
+        conn.exec('sudo su - jboss; cp ' + soruce + dd + '/* ' + desc + ';', {pty: true}, function (err, stream) {
+          if (err) throw err
+          stream.on('close', function (code, signal) {
+            console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
+            conn.end()
+          }).on('data', function (data) {
+            resolve('BACKUP')
+            console.log('STDOUT: ' + data)
+            return data
+          }).stderr.on('data', function (data) {
+            resolve('ERROR')
+            console.log('STDERR: ' + data)
+            return data
+          })
+        })
+      }).connect({
+        host: ipaddress,
+        port: 22,
+        username: username,
+        password: password,
+        readyTimeout: 99999
+        // privateKey: require('fs').readFileSync('./')
+        //  privateKey: require('fs').readFileSync('/here/is/my/key')
+      })
+    })
+  },
+  changeuser (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
     var conn = new Client()
     console.log('changeuser')
     conn.on('ready', function () {
