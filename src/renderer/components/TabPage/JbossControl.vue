@@ -3,8 +3,8 @@
     <table class="table" style="width:100%">
       <thead>
         <tr>
-          <th>check</th>
-          <th>ID</th>
+          <th>Check</th>
+          <th>Id</th>
           <th>Plaza Id</th>
           <th>Jboss Status</th>
           <th  align='center'>Control </th>

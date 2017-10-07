@@ -86,7 +86,8 @@
             <table class="table" style="width:100%">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>Check</th>
+                  <th>Id</th>
                   <th>Plaza Id</th>
                   <th>Deploy Status</th>
                   <th><center>Control</center></th>
@@ -94,6 +95,10 @@
               </thead>
               <tbody>
                 <tr v-for="(data, index) in lists">
+                  <td>
+                    <input type="checkbox" :value="index" v-model="checkes">
+                    <label for="checkbox">{{ data.ipadderess }}</label>
+                  </td>
                   <td>{{ data.id }}</td>
                   <td>{{ data.name }}</td>
                   <td><span :class="['tag', renderTag(data.status)]">{{ data.status }}</span></td>
@@ -127,7 +132,8 @@
         lists: [],
         image: '',
         Message: '1',
-        filejar: ''
+        filejar: '',
+        checkes: []
       }
     },
     methods: {
