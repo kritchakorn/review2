@@ -26,8 +26,8 @@
         </tr>
       </tbody>
     </table>
-    <router-link class="button" to="/">Go to home</router-link>
-    <a @click="btnClick" class="button is-warning">btun</a>
+    <a @class="btnClick" class="button is-info" @click="checkbackup2()">Check Backup</a>
+    <a @class="btnClick" class="button is-success" @click="backupear2()">Backup</a>
   </section>
 </template>
 <script>
