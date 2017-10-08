@@ -7,6 +7,7 @@
           <th>Id</th>
           <th>Plaza Id</th>
           <th>Backup Status</th>
+          <th><center>Control</center></th>
         </tr>
       </thead>
       <tbody>
@@ -18,6 +19,10 @@
           <td>{{ data.id }}</td>
           <td>{{ data.name }}</td>
           <td><span :class="['tag', renderTag(data.status)]">{{ data.status }}</span></td>
+          <td>
+            <a class="button" @click="checkbackup(data, index)">Check Backup</a>
+            <a class="button" @click="backupear(data, index)">Backup</a>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -117,32 +122,6 @@ export default {
         // this.lists[index].status = mssg
       }).catch((error) => {
         console.log('######error########' + error)
-      })
-    },
-    checkbackup2  () {
-      this.checkes.forEach((index) => {
-        let data = this.lists[index]
-        console.log('check jboss')
-        console.log(data.ipaddress)
-        var msg = ''
-        jbossutil.checkbackupjboss(data.ipaddress, 'bemhq', '@HQbem246').then((mssg) => {
-          msg = mssg
-          console.log('######success' + msg + '123')
-          this.lists[index].status = mssg
-          if (mssg === 'BACKUP') {
-            console.log('set status YES' + mssg)
-            this.lists[index].status = 'BACKUP'
-          } else if (mssg === 'NO') {
-            console.log('set status NO' + mssg)
-            this.lists[index].status = 'NO'
-          } else if (mssg === 'ERROR') {
-            console.log('set status ERROR ' + mssg)
-            this.lists[index].status = 'ERROR'
-          }
-          // this.lists[index].status = mssg
-        }).catch((error) => {
-          console.log('######error########' + error)
-        })
       })
     },
     onCheckAction (data, index) {

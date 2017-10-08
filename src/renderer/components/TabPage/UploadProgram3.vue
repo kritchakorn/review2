@@ -89,6 +89,7 @@
               <th>Id</th>
               <th>Plaza Id</th>
               <th>Deploy Status</th>
+              <th><center>Control</center></th>
             </tr>
           </thead>
           <tbody>
@@ -100,6 +101,9 @@
               <td>{{ data.id }}</td>
               <td>{{ data.name }}</td>
               <td><span :class="['tag', renderTag(data.status)]">{{ data.status }}</span></td>
+              <td>
+                <center><a class="button" @click="deployprogram(data, index)">Deploy Program</a></center>
+              </td>
             </tr>
           </tbody>
         </table>

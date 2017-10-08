@@ -3,22 +3,27 @@
     <table class="table" style="width:100%">
       <thead>
         <tr>
-          <th><center>Check</center></th>
+          <th>Check</th>
           <th>Id</th>
           <th>Plaza Id</th>
           <th>Jboss Status</th>
+          <th  align='center'>Control </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(data, index) in lists">
-          <td><center>
+          <td>
             <input type="checkbox" :value="index" v-model="checkes">
             <label for="checkbox">{{ data.ipadderess }}</label>
-          </center></td>
+          </td>
           <td>{{ data.id }}</td>
           <td>{{ data.name }}</td>
           <td><span :class="['tag', renderTag(data.status)]">{{ data.status }}</span></td>
-        </tr>
+          <td><a class="button" @click="oncheckjboss(data, index)">Check Status</a>
+            <a class="button" @click="onstartjboss(data, index)">Start Jboss</a>
+            <a class="button" @click="onstopjboss(data, index)">Stop Jboss</a>
+            <a class="button" @click="onkilljboss(data, index)">Force Kill Jboss</a></td>
+          </tr>
         </tbody>
       </table>
       <a @class="btnClick" class="button is-info" @click="oncheckjboss2()">Check Status</a>
@@ -31,11 +36,9 @@
   <script>
   import Common from '@/helper/Common'
   import jbossutil from '@/helper/jbossutil'
-  var config = require('@/helper/config')
   export default {
     created () {
       this.lists = Common.readfileconf()
-      console.log('abc' + this.lists)
     },
     data () {
       return {
@@ -57,8 +60,8 @@
         console.log('check jboss')
         console.log(data.ipaddress)
         var msg = ''
-        jbossutil.killjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS)
-        jbossutil.checkstatus(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
+        jbossutil.killjboss(data.ipaddress, 'root', 'password')
+        jbossutil.checkstatus(data.ipaddress, 'root', 'password').then((mssg) => {
           msg = mssg
           console.log('######success########' + mssg)
           if (msg === 'active') {
@@ -82,8 +85,8 @@
           let data = this.lists[index]
           console.log(data.ipaddress)
           var msg = ''
-          jbossutil.killjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS)
-          jbossutil.checkstatus(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
+          jbossutil.killjboss(data.ipaddress, 'root', 'password')
+          jbossutil.checkstatus(data.ipaddress, 'root', 'password').then((mssg) => {
             msg = mssg
             console.log('######success########' + mssg)
             if (msg === 'active') {
@@ -156,7 +159,7 @@
         console.log('start jboss')
         console.log(data.ipaddress)
         var msg = ''
-        console.log(jbossutil.startjboss('10.250.3.36', config.SSH_USER, config.SSH_PASS)).then((mssg) => {
+        console.log(jbossutil.startjboss('10.250.3.36', 'root', 'password')).then((mssg) => {
           msg = mssg
           console.log('######success########' + mssg)
           if (msg === 'active') {
@@ -180,7 +183,7 @@
           console.log('start jboss')
           console.log(data.ipaddress)
           var msg = ''
-          console.log(jbossutil.startjboss('10.250.3.36', config.SSH_USER, config.SSH_PASS)).then((mssg) => {
+          console.log(jbossutil.startjboss('10.250.3.36', 'root', 'password')).then((mssg) => {
             msg = mssg
             console.log('######success########' + mssg)
             if (msg === 'active') {
@@ -203,7 +206,7 @@
         console.log('start jboss')
         console.log(data.ipaddress)
         var msg = ''
-        console.log(jbossutil.stopjboss('10.250.3.36', config.SSH_USER, config.SSH_PASS)).then((mssg) => {
+        console.log(jbossutil.stopjboss('10.250.3.36', 'root', 'password')).then((mssg) => {
           msg = mssg
           console.log('######success########' + mssg)
           if (msg === 'active') {
@@ -227,7 +230,7 @@
           console.log('start jboss')
           console.log(data.ipaddress)
           var msg = ''
-          console.log(jbossutil.stopjboss('10.250.3.36', config.SSH_USER, config.SSH_PASS)).then((mssg) => {
+          console.log(jbossutil.stopjboss('10.250.3.36', 'root', 'password')).then((mssg) => {
             msg = mssg
             console.log('######success########' + mssg)
             if (msg === 'active') {

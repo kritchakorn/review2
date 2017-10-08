@@ -38,7 +38,7 @@ var a = {
     var last = array.length
     console.log(last)
     for (var i in array) {
-      if (j >= 1 && j <= 3) {
+      if (j >= 1 && j <= last) {
         var item = {}
         console.log(i)
         var arr = array[i].trim().split(',')
