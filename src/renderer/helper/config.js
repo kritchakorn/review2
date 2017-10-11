@@ -6,5 +6,5 @@ config.SSH_PASS = '@HQbem246'
 config.BEMHQSCTIP = '/home/bemhq/script/'
 config.SOURCE = '/home/bemhq/deployfile_'
 config.DESC = '/home/jboss/jboss-4.2.3.GA/server/default/deploy/'
-
+config.UPLOADTEMP = 'src/tmpfile'
 module.exports = config

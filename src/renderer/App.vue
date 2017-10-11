@@ -10,7 +10,7 @@
   import Common from '@/helper/Common'
   export default {
     userlist: [],
-    name: 'review',
+    name: 'EaZSetup',
     created () {
       this.userlist = Common.readuserconf()
       console.log('load user' + this.userlist)

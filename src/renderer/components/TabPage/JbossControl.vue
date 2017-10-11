@@ -107,7 +107,7 @@
         console.log(data.ipaddress)
         var msg = ''
         //
-        jbossutil.checkstatus(data.ipaddress, 'bemhq', '@HQbem246').then((mssg) => {
+        jbossutil.checkstatus(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
           msg = mssg
           console.log('######success########' + mssg)
           if (msg === 'active') {
@@ -132,7 +132,7 @@
         var msg = ''
         this.checkes.forEach((index) => {
           let data = this.lists[index]
-          jbossutil.checkstatus(data.ipaddress, 'bemhq', '@HQbem246').then((mssg) => {
+          jbossutil.checkstatus(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
             msg = mssg
             console.log('######success########' + mssg)
             if (msg === 'active') {
@@ -156,7 +156,7 @@
         console.log('start jboss')
         console.log(data.ipaddress)
         var msg = ''
-        console.log(jbossutil.startjboss('10.250.3.36', config.SSH_USER, config.SSH_PASS)).then((mssg) => {
+        console.log(jbossutil.startjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS)).then((mssg) => {
           msg = mssg
           console.log('######success########' + mssg)
           if (msg === 'active') {
@@ -177,25 +177,24 @@
       onstartjboss2 () {
         this.checkes.forEach((index) => {
           let data = this.lists[index]
-          console.log('start jboss')
-          console.log(data.ipaddress)
-          var msg = ''
-          console.log(jbossutil.startjboss('10.250.3.36', config.SSH_USER, config.SSH_PASS)).then((mssg) => {
-            msg = mssg
+          console.log('start jboss' + data)
+          console.log(data.ipaddress + config.SSH_USER + config.SSH_PASS)
+          // var msg = ''
+          jbossutil.startjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
+            // msg = mssg
             console.log('######success########' + mssg)
-            if (msg === 'active') {
-              console.log('set status' + msg)
+            if (mssg === 'active') {
+              console.log('set status' + mssg)
               this.lists[index].status = 'active'
-            } else if (msg === 'inactive') {
-              console.log('set status' + msg)
+            } else if (mssg === 'inactive') {
+              console.log('set status' + mssg)
               this.lists[index].status = 'inactive'
             } else {
-              console.log('set status' + msg)
+              console.log('set status' + mssg)
               this.lists[index].status = 'none'
             }
           }).catch((error) => {
             console.log('######error########' + error)
-            msg = error
           })
         })
       },
@@ -203,7 +202,7 @@
         console.log('start jboss')
         console.log(data.ipaddress)
         var msg = ''
-        console.log(jbossutil.stopjboss('10.250.3.36', config.SSH_USER, config.SSH_PASS)).then((mssg) => {
+        console.log(jbossutil.stopjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS)).then((mssg) => {
           msg = mssg
           console.log('######success########' + mssg)
           if (msg === 'active') {
@@ -227,7 +226,7 @@
           console.log('start jboss')
           console.log(data.ipaddress)
           var msg = ''
-          console.log(jbossutil.stopjboss('10.250.3.36', config.SSH_USER, config.SSH_PASS)).then((mssg) => {
+          console.log(jbossutil.stopjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS)).then((mssg) => {
             msg = mssg
             console.log('######success########' + mssg)
             if (msg === 'active') {

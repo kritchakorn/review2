@@ -28,6 +28,7 @@
 <script>
 import Common from '@/helper/Common'
 import jbossutil from '@/helper/jbossutil'
+var config = require('@/helper/config')
 
 export default {
   created () {
@@ -53,7 +54,7 @@ export default {
       console.log('check jboss')
       console.log(data.ipaddress)
       var msg = ''
-      jbossutil.backupjboss(data.ipaddress, 'bemhq', '@HQbem246').then((mssg) => {
+      jbossutil.backupjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
         msg = mssg
         console.log('######success########' + mssg)
         if (msg === 'BACKUP') {
@@ -74,10 +75,10 @@ export default {
     backupear2 () {
       this.checkes.forEach((index) => {
         let data = this.lists[index]
-        console.log('check jboss')
+        console.log('backup jboss')
         console.log(data.ipaddress)
         var msg = ''
-        jbossutil.backupjboss(data.ipaddress, 'bemhq', '@HQbem246').then((mssg) => {
+        jbossutil.backupjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
           msg = mssg
           console.log('######success########' + mssg)
           if (msg === 'BACKUP') {
@@ -100,7 +101,7 @@ export default {
       console.log('check jboss')
       console.log(data.ipaddress)
       var msg = ''
-      jbossutil.checkbackupjboss(data.ipaddress, 'bemhq', '@HQbem246').then((mssg) => {
+      jbossutil.checkbackupjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
         msg = mssg
         console.log('######success' + msg + '123')
         this.lists[index].status = mssg
@@ -125,7 +126,7 @@ export default {
         console.log('check jboss')
         console.log(data.ipaddress)
         var msg = ''
-        jbossutil.checkbackupjboss(data.ipaddress, 'bemhq', '@HQbem246').then((mssg) => {
+        jbossutil.checkbackupjboss(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
           msg = mssg
           console.log('######success' + msg + '123')
           this.lists[index].status = mssg

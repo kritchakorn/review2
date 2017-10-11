@@ -56,31 +56,33 @@ var b = {
     })
   },
   startjboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
-    var conn = new Client()
-    console.log('F.startjboss')
-    conn.on('ready', function () {
-      console.log('Client :: ready')
-      conn.exec('sudo su - jboss;service jboss start', function (err, stream) {
-        if (err) throw err
-        stream.on('close', function (code, signal) {
-          console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
-          conn.end()
-        }).on('data', function (data) {
-          console.log('STDOUT: ' + data)
-          return data
-        }).stderr.on('data', function (data) {
-          console.log('STDERR: ' + data)
-          return data
+    console.log(ipaddress + username + password)
+    return new Promise((resolve, reject) => {
+      var conn = new Client()
+      conn.on('ready', function () {
+        console.log('Client :: ready')
+        conn.exec('sudo -u root -H sh -c "service jboss start"', {pty: true}, function (err, stream) {
+          if (err) throw err
+          stream.on('close', function (code, signal) {
+            console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
+            conn.end()
+          }).on('data', function (data) {
+            console.log('STDOUT: ' + data)
+            resolve(data)
+          }).stderr.on('data', function (data) {
+            console.log('STDERR: ' + data)
+            resolve(data)
+          })
         })
+      }).connect({
+        host: ipaddress,
+        port: 22,
+        username: username,
+        password: password,
+        readyTimeout: 99999
+        // privateKey: require('fs').readFileSync('./')
+        //  privateKey: require('fs').readFileSync('/here/is/my/key')
       })
-    }).connect({
-      host: ipaddress,
-      port: 22,
-      username: username,
-      password: password,
-      readyTimeout: 99999
-      // privateKey: require('fs').readFileSync('./')
-      //  privateKey: require('fs').readFileSync('/here/is/my/key')
     })
   },
   stopjboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
@@ -88,7 +90,7 @@ var b = {
     console.log('F.stopjboss')
     conn.on('ready', function () {
       console.log('Client :: ready')
-      conn.exec('sudo su - jboss;service jboss stop', function (err, stream) {
+      conn.exec('sudo -u root -H sh -c "service jboss stop"', function (err, stream) {
         if (err) throw err
         stream.on('close', function (code, signal) {
           console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
@@ -116,8 +118,8 @@ var b = {
     console.log('F.stopjboss')
     conn.on('ready', function () {
       console.log('Client :: ready')
-      console.log('sudo su jboss;ps -ef | grep jboss | grep -v grep | awk ' + '\'' + '{print $2}' + '\'' + '| xargs kill -9')
-      conn.exec('ps -ef | grep jboss | grep -v grep | awk ' + '\'' + '{print $2}' + '\'' + ' | xargs kill -9', function (err, stream) {
+      console.log('sudo -u root -H sh -c ' + '"ps -ef | grep /home/jboss | grep -v grep | awk ' + '\'' + '{print $2}' + '\'' + ' | xargs kill -9"')
+      conn.exec('sudo -u root -H sh -c ' + '"ps -ef | grep /home/jboss | grep -v grep | awk ' + '\'' + '{print $2}' + '\'' + ' | xargs kill -9"', {pty: true}, function (err, stream) {
         if (err) throw err
         stream.on('close', function (code, signal) {
           console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
@@ -145,10 +147,10 @@ var b = {
       var conn = new Client()
       console.log('F.backupjboss')
       var now = new Date()
-      var dd = dateFormat(now, 'YYYY-MM-DD')
+      var dd = dateFormat(now, 'yyyy-mm-dd')
       conn.on('ready', function () {
         console.log('start backup' + dd)
-        conn.exec('sudo su - jboss; sh ./home/jboss/jboss-4.2.3.GA/server/default/ear_backup.sh;', function (err, stream) {
+        conn.exec('sudo -u jboss -H sh -c "cd /home/jboss/jboss-4.2.3.GA/server/default/;sh ear_backup.sh"', {pty: true}, function (err, stream) {
           if (err) throw err
           stream.on('close', function (code, signal) {
             console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
@@ -179,7 +181,7 @@ var b = {
       var conn = new Client()
       conn.on('ready', function () {
         console.log('Client :: ready')
-        conn.exec('sudo su jboss /home/bemhq/script/checkbackup.sh', {pty: true}, function (err, stream) {
+        conn.exec('sudo -u jboss -H sh -c "cd /home/jboss/jboss-4.2.3.GA/server/default/;sh checkbackup.sh"', {pty: true}, function (err, stream) {
           if (err) throw err
           stream.on('close', function (code, signal) {
             console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
@@ -238,97 +240,98 @@ var b = {
     })
   },
   createdeployfolder (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
-    var conn = new Client()
-    var now = new Date()
-    var dd = dateFormat(now, 'yyyy-mm-dd')
-    console.log('F.startjboss')
-    conn.on('ready', function () {
-      console.log('Client :: ready')
-      conn.exec('cd /home/bemhq/;mkdir deployfile_' + dd, function (err, stream) {
-        if (err) throw err
-        stream.on('close', function (code, signal) {
-          console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
-          conn.end()
-        }).on('data', function (data) {
-          console.log('STDOUT: ' + data)
-          return data
-        }).stderr.on('data', function (data) {
-          console.log('STDERR: ' + data)
-          return data
-        })
-      })
-    }).connect({
-      host: ipaddress,
-      port: 22,
-      username: username,
-      password: password,
-      readyTimeout: 99999
-      // privateKey: require('fs').readFileSync('./')
-      //  privateKey: require('fs').readFileSync('/here/is/my/key')
-    })
-  },
-  deployfile (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS, filename = '') {
-    var conn = new Client()
-    var connSettings = {
-      host: ipaddress,
-      port: 22, // Normal is 22 port
-      username: username,
-      password: password
-    }
-    // var remotePathToList = '/var/www/ourcodeworld'
-    var list = Common.readuploadfile('src/tmpfile')
-    console.log(list)
-    for (var val of list) {
-      console.log('deploy file' + val)
-      var file = val
-      var now = new Date()
-      var dd = dateFormat(now, 'yyyy-mm-dd')
-      // var filepaht = 'c:\\review2\\src\\tmpfile\\' + list[i]
-      // var fileuplad = '/home/bemhq/' + list[i]
-      // console.log('1 file:' + filepaht + ' end')
-      console.log('2 file:' + file + ' end')
-      conn.on('ready', function () {
-        conn.sftp(function (err, sftp) {
-          console.log(err)
-          if (err) throw err
-          console.log('read stream')
-          var readStream = fs.createReadStream('./src/tmpfile/' + file)
-          console.log('write stream')
-          var writeStream = sftp.createWriteStream('/home/bemhq/deployfile_' + dd + '/' + file)
-          writeStream.on('close', function () {
-            console.log('- file transferred succesfully')
-          })
-          writeStream.on('end', function () {
-            console.log('sftp connection closed')
-            conn.close()
-          })
-          console.log('write file' + writeStream)
-          readStream.pipe(writeStream)
-        })
-      }).connect(connSettings)
-    }
-  },
-  movetojboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS, soruce = config.SOURCE, desc = config.DESC) {
     return new Promise((resolve, reject) => {
       var conn = new Client()
-      console.log('F.backupjboss')
       var now = new Date()
-      var dd = dateFormat(now, 'YYYY-MM-DD')
+      var dd = dateFormat(now, 'yyyy-mm-dd-hh-MM')
+      console.log('F.startjboss')
       conn.on('ready', function () {
-        console.log('sudo su - jboss; cp ' + soruce + dd + '/* ' + desc + ';')
-        conn.exec('sudo su - jboss; cp ' + soruce + dd + '/* ' + desc + ';', {pty: true}, function (err, stream) {
+        console.log('Client :: ready')
+        conn.exec('cd /home/bemhq/;mkdir deployfile_' + dd, function (err, stream) {
           if (err) throw err
           stream.on('close', function (code, signal) {
             console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
             conn.end()
           }).on('data', function (data) {
-            resolve('BACKUP')
             console.log('STDOUT: ' + data)
-            return data
+            resolve('SUCESS')
+          }).stderr.on('data', function (data) {
+            console.log('STDERR: ' + data)
+            resolve('ERROR')
+          })
+        })
+      }).connect({
+        host: ipaddress,
+        port: 22,
+        username: username,
+        password: password,
+        readyTimeout: 99999
+        // privateKey: require('fs').readFileSync('./')
+        //  privateKey: require('fs').readFileSync('/here/is/my/key')
+      })
+    })
+  },
+  deployfile (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS, filename = '') {
+    return new Promise((resolve, reject) => {
+      var conn = new Client()
+      var connSettings = {
+        host: ipaddress,
+        port: 22, // Normal is 22 port
+        username: username,
+        password: password
+      }
+      // var remotePathToList = '/var/www/ourcodeworld'
+      var list = Common.readuploadfile('src/tmpfile')
+      console.log(list)
+      for (var val of list) {
+        console.log('deploy file' + val)
+        var file = val
+        var now = new Date()
+        var dd = dateFormat(now, 'yyyy-mm-dd-hh-MM')
+        console.log('2 file:' + file + ' end')
+        conn.on('ready', function () {
+          conn.sftp(function (err, sftp) {
+            // console.log(err)
+            if (err) throw err
+            console.log('read stream')
+            var readStream = fs.createReadStream('./src/tmpfile/' + file)
+            console.log('write stream')
+            var writeStream = sftp.createWriteStream('/home/bemhq/deployfile_' + dd + '/' + file)
+            writeStream.on('close', function () {
+              console.log('- file transferred succesfully')
+            })
+            writeStream.on('end', function () {
+              console.log('sftp connection closed')
+              conn.close()
+            })
+            console.log('write file' + writeStream)
+            readStream.pipe(writeStream)
+          })
+        }).connect(connSettings)
+      }
+    })
+  },
+  movetojboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS, soruce = config.SOURCE, desc = config.DESC) {
+    return new Promise((resolve, reject) => {
+      var conn = new Client()
+      console.log('movetojboss')
+      var now = new Date()
+      var dd = dateFormat(now, 'yyyy-mm-dd-hh-MM')
+      console.log('move to jboss ' + dd)
+      conn.on('ready', function () {
+        //  'sudo -u jboss -H sh -c "cd /home/jboss/jboss-4.2.3.GA/server/default/;sh checkbackup.sh'
+        console.log('sudo -u jboss -H sh -c ' + '" cp ' + soruce + dd + '/* ' + desc + ' "')
+        conn.exec('sudo -u jboss -H sh -c ' + '" cp ' + soruce + dd + '/* ' + desc + ' "', {pty: true}, function (err, stream) {
+          if (err) throw err
+          stream.on('close', function (code, signal) {
+            console.log('327 Stream :: close :: code: ' + code + ', signal: ' + signal)
+            conn.end()
+          }).on('data', function (data) {
+            resolve('SUCESS')
+            console.log('STDOUT: ' + data)
           }).stderr.on('data', function (data) {
             resolve('ERROR')
             console.log('STDERR: ' + data)
-            return data
           })
         })
       }).connect({

@@ -41,3 +41,4 @@ ipaddress,plzaid,plazaname,jboss-status,backup-status,check-obu-status
 10.508.1.17,508,CR2,NONE,NONE,NONE
 10.509.1.17,509,BI1,NONE,NONE,NONE
 10.610.1.17,610,BI2,NONE,NONE,NONE
+10.250.3.36,360,TEST-Server,NONE,NONE,NONE

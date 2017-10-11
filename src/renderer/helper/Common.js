@@ -27,13 +27,13 @@ var a = {
   },
   readuploadfile (path = 'src/tmpfile') {
     var files = fs.readdirSync(path)
-    console.log(files)
+    // console.log(files)
     return files
   },
   readfileconf () {
     var lists = []
     var array = fs.readFileSync('src/renderer/helper/plaza.txt').toString().trim().split(os.EOL)
-    console.log('arra' + array)
+    // console.log('arra' + array)
     var j = 0
     var last = array.length
     console.log(last)
@@ -47,7 +47,7 @@ var a = {
         item.name = arr[2]
         item.status = arr[3]
         lists.push(item)
-        console.log(lists)
+        // console.log(lists)
       }
       j++
     }

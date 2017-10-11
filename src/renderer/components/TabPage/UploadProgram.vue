@@ -112,6 +112,7 @@
 <script>
 import Common from '@/helper/Common'
 import jbossutil from '@/helper/jbossutil'
+var async = require('async')
 var config = require('@/helper/config')
 var fs = require('fs')
 export default {
@@ -142,11 +143,29 @@ export default {
     deployprogram2 () {
       this.checkes.forEach((index) => {
         let data = this.lists[index]
-        console.log(data.ipaddress)
-        console.log('upload' + data.ipaddress + config.SORCE + config.DESC)
-        jbossutil.createdeployfolder(data.ipaddress, config.SSH_USER, config.SSH_PASS)
-        jbossutil.deployfile(data.ipaddress, config.SSH_USER, config.SSH_PASS)
-        jbossutil.movetojboss(data.ipaddress, config.SSH_USER, config.SSH_PASS)
+        async.series([
+          console.log(data.ipaddress),
+          console.log('1 create folder ' + data.ipaddress + config.SORCE + config.DESC),
+          jbossutil.createdeployfolder(data.ipaddress, config.SSH_USER, config.SSH_PASS),
+          console.log('2 deploy file ' + data.ipaddress),
+          jbossutil.deployfile(data.ipaddress, config.SSH_USER, config.SSH_PASS),
+          console.log('3 move file to jboss ' + data.ipaddress),
+          jbossutil.movetojboss(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
+            console.log('######success########' + mssg)
+            if (mssg === 'SUCCESS') {
+              console.log('set status' + mssg)
+              this.lists[index].status = 'SUCCESS'
+            } else if (mssg === 'ERROR') {
+              console.log('set status' + mssg)
+              this.lists[index].status = 'ERROR'
+            } else {
+              console.log('set status none')
+              this.lists[index].status = 'none'
+            }
+          }).catch((error) => {
+            console.log('######error########' + error)
+          })
+        ])
       })
     },
     uploadFile (e) {
@@ -154,13 +173,13 @@ export default {
       if (this.check()) {
         var path = 'src/tmpfile/' + this.filejar.name
         this.copyFile(this.filejar.path, path)
-        this.lists2 = Common.readuploadfile('src/tmpfile')
+        this.lists2 = Common.readuploadfile(config.UPLOADTEMP)
       }
       return 'error'
     },
     clearfile (e) {
       Common.clearfile('src/tmpfile')
-      this.lists2 = Common.readuploadfile('src/tmpfile')
+      this.lists2 = Common.readuploadfile(config.UPLOADTEMP)
     },
     uploadFile2 () {
       // jbossutil.changeuser('10.201.1.17', 'bemhq', '@HQbem246')
@@ -170,16 +189,17 @@ export default {
     check () {
       // console.log(files.name)
       if (!this.filejar.size) {
-        console.log('false')
+        console.log('file sieze is zero cancle upload')
         return false
       }
       console.log('true')
       return true
     },
     renderTag (status) {
-      if (status === 'BACKUP') {
+      // console.log(status)
+      if (status === 'SUCESS') {
         return 'is-success'
-      } else if (status === 'NO') {
+      } else if (status === 'ERROR') {
         return 'is-danger'
       }
     },
