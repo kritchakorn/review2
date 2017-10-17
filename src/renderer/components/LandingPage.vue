@@ -2,9 +2,8 @@
   <div class="container">
     <div class="section">
       <div class="field">
-        <label class="label">Name</label>
         <div class="control">
-          <input class="input" type="text" placeholder="" v-model="model">
+          <h1>EaZSetup Vesion 1.0</h1>
         </div>
       </div>
       <div class="field">

@@ -85,7 +85,8 @@
         <table class="table" style="width:100%">
           <thead>
             <tr>
-              <th>Check</th>
+              <th><input type="checkbox" onclick="for(c in document.getElementsByName('checkbox')) document.getElementsByName('checkbox').item(c).checked = this.checked">
+              Check</th>
               <th>Id</th>
               <th>Plaza Id</th>
               <th>Deploy Status</th>
@@ -94,7 +95,7 @@
           <tbody>
             <tr v-for="(data, index) in lists">
               <td>
-                <input type="checkbox" :value="index" v-model="checkes">
+                <input type="checkbox" name="checkbox" :value="index" v-model="checkes">
                 <label for="checkbox">{{ data.ipadderess }}</label>
               </td>
               <td>{{ data.id }}</td>
@@ -108,7 +109,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import Common from '@/helper/Common'
 import jbossutil from '@/helper/jbossutil'
@@ -140,16 +140,37 @@ export default {
       jbossutil.deployfile(data.ipaddress, config.SSH_USER, config.SSH_PASS)
       jbossutil.movetojboss(data.ipaddress, config.SSH_USER, config.SSH_PASS)
     },
+    deployprogram3 () {
+      this.checkes.forEach((index) => {
+        let data = this.lists[index]
+        jbossutil.createdeployfolder(data.ipaddress, config.SSH_USER, config.SSH_PASS)
+        jbossutil.deployfile(data.ipaddress, config.SSH_USER, config.SSH_PASS)
+        jbossutil.movetojboss(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
+          console.log('######success########' + mssg)
+          if (mssg === 'SUCCESS') {
+            console.log('set status' + mssg)
+            this.lists[index].status = 'SUCCESS'
+          } else if (mssg === 'ERROR') {
+            console.log('set status' + mssg)
+            this.lists[index].status = 'ERROR'
+          } else {
+            console.log('set status none')
+            this.lists[index].status = 'none'
+          }
+        }).catch((error) => {
+          console.log('######error########' + error)
+        })
+      })
+    },
     deployprogram2 () {
       this.checkes.forEach((index) => {
         let data = this.lists[index]
         async.series([
-          console.log(data.ipaddress),
-          console.log('1 create folder ' + data.ipaddress + config.SORCE + config.DESC),
+          // console.log(data.ipaddress),
+          // console.log('1 create folder ' + data.ipaddress + config.SORCE + config.DESC),
           jbossutil.createdeployfolder(data.ipaddress, config.SSH_USER, config.SSH_PASS),
-          console.log('2 deploy file ' + data.ipaddress),
+          // console.log('2 deploy file ' + data.ipaddress),
           jbossutil.deployfile(data.ipaddress, config.SSH_USER, config.SSH_PASS),
-          console.log('3 move file to jboss ' + data.ipaddress),
           jbossutil.movetojboss(data.ipaddress, config.SSH_USER, config.SSH_PASS).then((mssg) => {
             console.log('######success########' + mssg)
             if (mssg === 'SUCCESS') {
@@ -165,7 +186,11 @@ export default {
           }).catch((error) => {
             console.log('######error########' + error)
           })
-        ])
+        ], function (err, results) {
+          // Here, results is an array of the value from each function
+          console.log(results)
+          throw err
+        })
       })
     },
     uploadFile (e) {
@@ -264,6 +289,21 @@ export default {
     },
     btnClick () {
       console.log(Common.hello())
+    },
+    dothis () {
+      var checkboxes = document.getElementsByName('approve[]')
+      var button = document.getElementById('toggle')
+      if (button.value === 'select') {
+        for (var j in checkboxes) {
+          checkboxes[j].checked = 'FALSE'
+        }
+        button.value = 'deselect'
+      } else {
+        for (var k in checkboxes) {
+          checkboxes[k].checked = ''
+        }
+        button.value = 'select'
+      }
     }
   }
 }

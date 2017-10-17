@@ -86,31 +86,33 @@ var b = {
     })
   },
   stopjboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
-    var conn = new Client()
-    console.log('F.stopjboss')
-    conn.on('ready', function () {
-      console.log('Client :: ready')
-      conn.exec('sudo -u root -H sh -c "service jboss stop"', function (err, stream) {
-        if (err) throw err
-        stream.on('close', function (code, signal) {
-          console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
-          conn.end()
-        }).on('data', function (data) {
-          console.log('STDOUT: ' + data)
-          return data
-        }).stderr.on('data', function (data) {
-          console.log('STDERR: ' + data)
-          return data
+    return new Promise((resolve, reject) => {
+      var conn = new Client()
+      console.log('F.stopjboss')
+      conn.on('ready', function () {
+        console.log('Client :: ready')
+        conn.exec('sudo -u root -H sh -c "service jboss stop"', {pty: true}, function (err, stream) {
+          if (err) throw err
+          stream.on('close', function (code, signal) {
+            console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
+            conn.end()
+          }).on('data', function (data) {
+            console.log('STDOUT: ' + data)
+            return data
+          }).stderr.on('data', function (data) {
+            console.log('STDERR: ' + data)
+            return data
+          })
         })
+      }).connect({
+        host: ipaddress,
+        port: 22,
+        username: username,
+        password: password,
+        readyTimeout: 99999
+        // privateKey: require('fs').readFileSync('./')
+        //  privateKey: require('fs').readFileSync('/here/is/my/key')
       })
-    }).connect({
-      host: ipaddress,
-      port: 22,
-      username: username,
-      password: password,
-      readyTimeout: 99999
-      // privateKey: require('fs').readFileSync('./')
-      //  privateKey: require('fs').readFileSync('/here/is/my/key')
     })
   },
   killjboss (ipaddress = config.SSH_DEFAULT, username = config.SSH_USER, password = config.SSH_PASS) {
@@ -247,17 +249,18 @@ var b = {
       console.log('F.startjboss')
       conn.on('ready', function () {
         console.log('Client :: ready')
-        conn.exec('cd /home/bemhq/;mkdir deployfile_' + dd, function (err, stream) {
-          if (err) throw err
+        conn.exec('cd /home/bemhq/;mkdir deployfile_' + dd + '; pwd ;', function (err, stream) {
+          if (err) {
+            console.log(err)
+            throw err
+          }
           stream.on('close', function (code, signal) {
             console.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
             conn.end()
           }).on('data', function (data) {
-            console.log('STDOUT: ' + data)
-            resolve('SUCESS')
+            console.log('STDOUT:' + data)
           }).stderr.on('data', function (data) {
             console.log('STDERR: ' + data)
-            resolve('ERROR')
           })
         })
       }).connect({
@@ -265,7 +268,8 @@ var b = {
         port: 22,
         username: username,
         password: password,
-        readyTimeout: 99999
+        readyTimeout: 99999,
+        allowHalfOpen: false
         // privateKey: require('fs').readFileSync('./')
         //  privateKey: require('fs').readFileSync('/here/is/my/key')
       })
